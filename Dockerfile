@@ -20,7 +20,7 @@ COPY docker/platformio.ini /pio/platformio.ini
 RUN platformio run -d /pio; rm -rf /pio
 
 COPY . .
-RUN pip install --no-cache-dir --no-binary :all: -e . && \
+RUN pip install --no-cache-dir --no-binary :all: ptvsd hvac==0.2.17 -e . && \
     pip install --no-cache-dir pillow
 
 WORKDIR /config

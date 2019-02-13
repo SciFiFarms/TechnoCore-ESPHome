@@ -488,6 +488,7 @@ def run_esphomeyaml(argv):
 
     CORE.config_path = args.configuration
 
+    yaml_util.setCommand(args.command)
     config = read_config(args.verbose)
     if config is None:
         return 1
