@@ -9,7 +9,9 @@ import uuid
 
 import yaml
 import yaml.constructor
-
+import paho.mqtt.client
+import hvac
+import ssl
 from esphomeyaml import core
 from esphomeyaml.core import EsphomeyamlError, HexInt, IPAddress, Lambda, MACAddress, TimePeriod
 from esphomeyaml.py_compat import text_type, string_types
@@ -39,6 +41,10 @@ class SafeLineLoader(yaml.SafeLoader):  # pylint: disable=too-many-ancestors
         node = super(SafeLineLoader, self).compose_node(parent, index)  # type: yaml.nodes.Node
         node.__line__ = last_line + 1
         return node
+
+
+def setCommand(command):
+    SafeLineLoader.command = command
 
 
 def load_yaml(fname):
@@ -268,8 +274,42 @@ def _lambda(loader, node):
     return Lambda(text_type(node.value))
 
 
+def _gen_device_name(loader, node):
+    filename = node.start_mark.name
+    return os.path.splitext(os.path.basename(filename))[0]
+    
+def _gen_mqtt_username(loader, node):
+    return _gen_device_name(loader, node)
+    
+def _gen_mqtt_password(loader, node):
+    client = paho.mqtt.client.Client(client_id='esphomeyaml', clean_session=False)
+    client.username_pw_set(os.environ['MQTT_USERNAME'],os.environ['MQTT_PASSWORD'] )
+    # TODO: Don't create a file?
+    with open('ca', 'w+') as ca:
+        ca.write(os.environ['CA'])
+    client.tls_set('ca', tls_version=ssl.PROTOCOL_TLSv1_2)
+    client.connect(host='mqtt', port=8883)
+
+    hal_mqtt_username = _gen_device_name(loader, node) 
+    if SafeLineLoader.command != "config":
+        vault_client = hvac.Client(url='https://vault:8200', token=os.environ['VAULT_TOKEN'], verify='ca')
+        vault_client.token = os.environ['VAULT_TOKEN']
+        hal_mqtt_password = vault_client.write("sys/tools/random/16")['data']['random_bytes']
+        client.publish("mqtt/add/user/%s" % hal_mqtt_username, hal_mqtt_password, 2)
+    else:
+        hal_mqtt_password = "sanitized_password"
+
+    return hal_mqtt_password
+
+def _gen_mqtt_broker(loader, node):
+    return os.environ['MQTT_BROKER']
+
 yaml.SafeLoader.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, _ordered_dict)
 yaml.SafeLoader.add_constructor(yaml.resolver.BaseResolver.DEFAULT_SEQUENCE_TAG, _construct_seq)
+yaml.SafeLoader.add_constructor('!gen_device_name', _gen_device_name)
+yaml.SafeLoader.add_constructor('!gen_mqtt_username', _gen_mqtt_username)
+yaml.SafeLoader.add_constructor('!gen_mqtt_password', _gen_mqtt_password)
+yaml.SafeLoader.add_constructor('!gen_mqtt_broker', _gen_mqtt_broker)
 yaml.SafeLoader.add_constructor('!env_var', _env_var_yaml)
 yaml.SafeLoader.add_constructor('!secret', _secret_yaml)
 yaml.SafeLoader.add_constructor('!include', _include_yaml)
