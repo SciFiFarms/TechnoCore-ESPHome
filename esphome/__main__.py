@@ -463,6 +463,9 @@ def run_esphome(argv):
 
     CORE.config_path = args.configuration
 
+    # Added so that the creds generator for TecnoCore knows if it should sanitize passwords or not. 
+    CORE.command = args.command
+
     config = read_config(args.verbose)
     if config is None:
         return 1
