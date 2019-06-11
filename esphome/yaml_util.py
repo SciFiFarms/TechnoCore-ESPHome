@@ -16,6 +16,13 @@ from esphome.core import EsphomeError, IPAddress, Lambda, MACAddress, TimePeriod
 from esphome.py_compat import text_type, IS_PY2
 from esphome.util import OrderedDict
 
+# Needed to generate credentials for TechnoCore
+from esphome.core import CORE
+import paho.mqtt.client
+import hvac
+import ssl
+#import ptvsd
+
 _LOGGER = logging.getLogger(__name__)
 
 # Mostly copied from Home Assistant because that code works fine and
@@ -295,6 +302,47 @@ class ESPHomeLoader(yaml.SafeLoader):  # pylint: disable=too-many-ancestors
     @_add_data_ref
     def construct_lambda(self, node):
         return Lambda(text_type(node.value))
+    
+    # Begin additions for TechnoCore
+    @_add_data_ref
+    def construct_device_name(self, node):
+        filename = node.start_mark.name
+        return os.path.splitext(os.path.basename(filename))[0]
+
+    @_add_data_ref
+    def construct_mqtt_username(self, node):
+        return self.construct_device_name(node)
+
+    @_add_data_ref
+    def construct_mqtt_password(self, node):
+        #ptvsd.enable_attach()
+        #ptvsd.wait_for_attach()
+
+        client = paho.mqtt.client.Client(client_id='esphomeyaml', clean_session=False)
+        client.username_pw_set(os.environ['MQTT_USERNAME'],os.environ['MQTT_PASSWORD'] )
+
+        # TODO: Don't create a file?
+        with open('ca', 'w+') as ca:
+            ca.write(os.environ['CA'])
+
+        client.tls_set('ca', tls_version=ssl.PROTOCOL_TLSv1_2)
+        client.connect(host='mqtt', port=8883)
+
+        hal_mqtt_username = self.construct_device_name(node)
+        if CORE.command in ["compile", "run"]:
+            vault_client = hvac.Client(url='https://vault:8200', token=os.environ['VAULT_TOKEN'], verify='ca')
+            vault_client.token = os.environ['VAULT_TOKEN']
+            hal_mqtt_password = vault_client.write("sys/tools/random/16")['data']['random_bytes']
+            client.publish("mqtt/add/user/%s" % hal_mqtt_username, hal_mqtt_password, 2)
+        else:
+            hal_mqtt_password = "sanitized_password"
+
+        return hal_mqtt_password
+
+    @_add_data_ref
+    def construct_mqtt_broker(self, node):
+        return os.environ['MQTT_BROKER']
+    # End additions for TechnoCore
 
 
 def _filter_yaml_files(files):
@@ -320,6 +368,12 @@ ESPHomeLoader.add_constructor('!include_dir_named', ESPHomeLoader.construct_incl
 ESPHomeLoader.add_constructor('!include_dir_merge_named',
                               ESPHomeLoader.construct_include_dir_merge_named)
 ESPHomeLoader.add_constructor('!lambda', ESPHomeLoader.construct_lambda)
+
+# Added for TechnoCore credential generation
+ESPHomeLoader.add_constructor('!gen_device_name', ESPHomeLoader.construct_device_name)
+ESPHomeLoader.add_constructor('!gen_mqtt_username', ESPHomeLoader.construct_mqtt_username)
+ESPHomeLoader.add_constructor('!gen_mqtt_password', ESPHomeLoader.construct_mqtt_password)
+ESPHomeLoader.add_constructor('!gen_mqtt_broker', ESPHomeLoader.construct_mqtt_broker)
 
 
 def load_yaml(fname):
