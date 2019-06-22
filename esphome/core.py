@@ -508,6 +508,8 @@ class EsphomeCore(object):
         # A set of component IDs to track what Component subclasses are declared
         self.component_ids = set()
 
+        self.command = None
+
     def reset(self):
         self.dashboard = False
         self.name = None
