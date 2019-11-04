@@ -82,9 +82,4 @@ services:
       #- esphome-build:/tmp/esphome-build/
     user: "0" # I suspect I'll be able to remove this. I'd like to do that. 
       
-  mqtt:
-    networks:
-      - esphome
-    secrets:
-      - source: mqtt_esphome_password
-        target: users/esphome
+    
