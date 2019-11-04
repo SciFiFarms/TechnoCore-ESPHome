@@ -2,53 +2,40 @@ version: "3.5"
 
 networks:
   esphome:
-  esphome-private:
+    attachable: true
 
 volumes:
   esphome:
-  esphome-db:
 
-#secrets:
-  # Secrets format
-  # ${service_name}_${mount_point}:
-  #   name: ${STACK_NAME:-technocore}_${service_name}_${mount_point}
-  # #   external: true
-  esphome_admin_username:
-    name: ${STACK_NAME:-technocore}_esphome_admin_username
+secrets:
+  mqtt_esphome_password:
+    name: ${STACK_NAME:-technocore}_mqtt_esphome_password
     external: true
-  esphome_admin_password:
-    name: ${STACK_NAME:-technocore}_esphome_admin_password
-    external: true
-  esphome_esphome-db_username:
-    name: ${STACK_NAME:-technocore}_esphome_esphome-db_username
-    external: true
-  esphome_esphome-db_password:
-    name: ${STACK_NAME:-technocore}_esphome_esphome-db_password
+  esphome_mqtt_password:
+    name: ${STACK_NAME:-technocore}_esphome_mqtt_password
     external: true
 
 services:
   ## Uncomment this if Traefik will be used for routing traffick to this service.
-  #ingress:
-  #  networks:
-  #    - esphome
+  ingress:
+    networks:
+      - esphome
 
   esphome:
     deploy:
       labels:
-      #  # These env vars should infact be uppercase
-      #  - traefik.frontend.rule=$ESPHOME_ROUTING_LABEL
-      #  - traefik.frontend.priority=$ESPHOME_ROUTING_LABEL_PRIORITY
-      #  - traefik.port=SET_ME_PLEASE
-      #  - ${TRAEFIK_BASIC_AUTH}
-      #  - traefik.enable=true
-      #  # You'll need to set applicaiton's port here.
-      #  - traefik.tags=ingress 
-      #  - traefik.docker.network=${STACK_NAME:-technocore}_esphome
-      #  # Traefik service that listens to HTTP
-      #  - traefik.redirectorservice.frontend.entryPoints=http
-      #  - traefik.redirectorservice.frontend.redirect.entryPoint=https
-      #  # Traefik service that listens to HTTPS
-      #  - traefik.webservice.frontend.entryPoints=https
+        - traefik.frontend.rule=$ESPHOME_ROUTING_LABEL
+        - traefik.frontend.priority=$ESPHOME_ROUTING_LABEL_PRIORITY
+        - traefik.port=6052
+        - ${TRAEFIK_BASIC_AUTH}
+        - traefik.enable=true
+        - traefik.tags=ingress 
+        - traefik.docker.network=${STACK_NAME:-technocore}_esphome
+        # Traefik service that listens to HTTP
+        - traefik.redirectorservice.frontend.entryPoints=http
+        - traefik.redirectorservice.frontend.redirect.entryPoint=https
+        # Traefik service that listens to HTTPS
+        - traefik.webservice.frontend.entryPoints=https
         - com.ouroboros.enable=true
       mode: global
       restart_policy:
@@ -62,52 +49,42 @@ services:
           memory: 128M
         reservations:
           memory: 64M
-    #environment:
+    environment:
+      - image_provider=${image_provider:-scififarms}
+      - STACK_NAME=${STACK_NAME:-technocore}
+      - service_name=esphome
+      - SERVICE_PORT=6052
+      - TAG=${TAG:-latest}
+      # This is used to allow the wrapper to mount the /config folder to the correct place on the host.
+      - host_working_dir=$PWD
+      #- debug=${esphome_debug}
+      - esphome_core=./esphome-core:/esphome-core
+      - esphome_app=${esphome_app_live_mount}
+      - TECHNOCORE_ROOT=${TECHNOCORE_ROOT}
       # Sometimes you have to pass in ${DOMAIN} to enable the correct link paths to be generated.
       # Othertimes you can use http:// or https:// for the website. Weird trick.
-    image: ${image_provider:-scififarms}/technocore-esphome:${TAG:-latest}
+    image: ${image_provider:-scififarms}/technocore-esphome-wrapper:${TAG:-latest}
     logging:
       driver: "${LOGGING_DRIVER}"
       options:
         tag: "{{.Name}}"
     networks:
       - esphome
-      - esphome-private
     #secrets:
-    #  - source: esphome_esphome_db_username
-    #    target: esphome_db_username
-    #  - source: esphome_esphome_db_password
-    #    target: esphome_db_password
-    #  - source: esphome_domain
-    #    target: domain
-    volumes:
-      # Likely need to change this
-      - esphome:/var/lib/esphome
-
-  esphome_db:
-    deploy:
-      labels:
-        - com.ouroboros.enable=true
-      mode: global
-      restart_policy:
-        condition: any
-    #environment:
-    image: ${image_provider:-scififarms}/technocore-esphome-db:${TAG:-latest}
-    logging:
-      driver: "${LOGGING_DRIVER}"
-      options:
-        tag: "{{.Name}}"
-    networks:
-      - esphome-private
     secrets:
-      - source: esphome_db_admin_username
-        target: admin_username
-      - source: esphome_db_admin_password
-        target: admin_password
-      - source: esphome_db_esphome_username
-        target: esphome_username
-      - source: esphome_db_esphome_password
-        target: esphome_password
+      - source: esphome_mqtt_password
+        target: mqtt_password
+
     volumes:
-      # Likely need to change this
-      - esphome-db:/var/lib/esphome
+      - /var/run/docker.sock:/var/run/docker.sock
+      # TODO: These don't seem needed?
+      #- ./esphome-core:/esphome-core
+      #- esphome-build:/tmp/esphome-build/
+    user: "0" # I suspect I'll be able to remove this. I'd like to do that. 
+      
+  mqtt:
+    networks:
+      - esphome
+    secrets:
+      - source: mqtt_esphome_password
+        target: users/esphome
