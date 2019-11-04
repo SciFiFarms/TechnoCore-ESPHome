@@ -1,0 +1,10 @@
+
+version: "3.5"
+
+services:
+  home_assistant:
+    environment:
+      - SIDEBAR_ESPHOME=        ESPHome|esphome.$DOMAIN|mdi:home-automation
+      
+    #networks:
+    #  - esphome
