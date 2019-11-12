@@ -1,8 +1,0 @@
-version: "3.5"
-services:
-  mqtt:
-    networks:
-      - esphome
-    secrets:
-      - source: mqtt_esphome_password
-        target: users/esphome

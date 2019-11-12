@@ -7,14 +7,6 @@ networks:
 volumes:
   esphome:
 
-secrets:
-  mqtt_esphome_password:
-    name: ${STACK_NAME:-technocore}_mqtt_esphome_password
-    external: true
-  esphome_mqtt_password:
-    name: ${STACK_NAME:-technocore}_esphome_mqtt_password
-    external: true
-
 services:
   ## Uncomment this if Traefik will be used for routing traffick to this service.
   ingress:
@@ -76,9 +68,6 @@ services:
     networks:
       - esphome
     #secrets:
-    secrets:
-      - source: esphome_mqtt_password
-        target: mqtt_password
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
