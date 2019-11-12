@@ -18,7 +18,7 @@ set_service_flag $service_name
 # prefix=$service_name
 
 set_optional_service home-assistant
-set_optional_service mqtt
+set_optional_service vernemq
 
 #generate_mount dev shell-migrations /usr/share/dogfish/shell-migr
 #      - ${esphome_live_mount:-./empty/:/opt/.dummy}
