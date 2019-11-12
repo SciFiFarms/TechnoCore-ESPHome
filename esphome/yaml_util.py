@@ -321,16 +321,11 @@ class ESPHomeLoader(yaml.SafeLoader):  # pylint: disable=too-many-ancestors
         client = paho.mqtt.client.Client(client_id='esphomeyaml', clean_session=False)
         client.username_pw_set(os.environ['MQTT_USERNAME'],os.environ['MQTT_PASSWORD'] )
 
-        # TODO: Don't create a file?
-        with open('ca', 'w+') as ca:
-            ca.write(os.environ['CA'])
-
-        client.tls_set('ca', tls_version=ssl.PROTOCOL_TLSv1_2)
-        client.connect(host='mqtt', port=8883)
+        client.connect(host='mqtt', port=1883)
 
         hal_mqtt_username = self.construct_device_name(node)
         if CORE.command in ["compile", "run"]:
-            vault_client = hvac.Client(url='https://vault:8200', token=os.environ['VAULT_TOKEN'], verify='ca')
+            vault_client = hvac.Client(url='http://vault:8200', token=os.environ['VAULT_TOKEN'])
             vault_client.token = os.environ['VAULT_TOKEN']
             hal_mqtt_password = vault_client.write("sys/tools/random/16")['data']['random_bytes']
             client.publish("mqtt/add/user/%s" % hal_mqtt_username, hal_mqtt_password, 2)
