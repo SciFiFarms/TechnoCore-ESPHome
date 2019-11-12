@@ -1,0 +1,18 @@
+version: "3.5"
+
+secrets:
+  esphome_vault_token:
+    name: ${STACK_NAME:-technocore}_esphome_vault_token
+    external: true
+
+services:
+  esphome:
+    secrets:
+      - source: esphome_vault_token
+        target: vault_token
+
+  vault:
+    environment:
+      - CREATE_SERVICE_ESPHOME=esphome
+    networks:
+      - esphome
