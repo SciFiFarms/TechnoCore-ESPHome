@@ -56,7 +56,7 @@ services:
       - MQTT_USERNAME=esphome
       # TODO: Have the python read the secrets file rather than the env.
       - MQTT_PASSWORD={{"{{DOCKER-SECRET:mqtt_password}}"}}
-      - MQTT_BROKER=mqtt
+      - MQTT_BROKER=mqtt.$DOMAIN
       - VAULT_TOKEN={{"{{DOCKER-SECRET:vault_token}}"}}
       # Sometimes you have to pass in ${DOMAIN} to enable the correct link paths to be generated.
       # Othertimes you can use http:// or https:// for the website. Weird trick.
@@ -75,4 +75,3 @@ services:
       #- ./esphome-core:/esphome-core
       #- esphome-build:/tmp/esphome-build/
     user: "0" # I suspect I'll be able to remove this. I'd like to do that. 
-
