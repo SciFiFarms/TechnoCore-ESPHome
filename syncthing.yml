@@ -1,0 +1,6 @@
+version: "3.5"
+services:
+  syncthing:
+    volumes:
+      - $ESPHOME_VOLUME:/var/syncthing/esphome
+

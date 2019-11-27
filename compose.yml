@@ -58,6 +58,7 @@ services:
       - MQTT_PASSWORD={{"{{DOCKER-SECRET:mqtt_password}}"}}
       - MQTT_BROKER=mqtt.$DOMAIN
       - VAULT_TOKEN={{"{{DOCKER-SECRET:vault_token}}"}}
+      - VOLUME=$ESPHOME_VOLUME
       # Sometimes you have to pass in ${DOMAIN} to enable the correct link paths to be generated.
       # Othertimes you can use http:// or https:// for the website. Weird trick.
     image: ${image_provider:-scififarms}/technocore-esphome-wrapper:${TAG:-latest}
@@ -71,6 +72,7 @@ services:
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - $ESPHOME_VOLUME:/config
       # TODO: These don't seem needed?
       #- ./esphome-core:/esphome-core
       #- esphome-build:/tmp/esphome-build/
