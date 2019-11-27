@@ -9,11 +9,14 @@
 # Leave blank to disable this service by default.
 set_service_flag $service_name
 
-if [[ "$LIVE_MOUNT_ESPHOME_ENABLED" != "" ]]; then
-    # START HERE: I think these might need
+if [ "$LIVE_MOUNT_ESPHOME_ENABLED" ]; then
     export ESPHOME_VOLUME=${TECHNOCORE_ROOT}/hals/
 else
     export ESPHOME_VOLUME=esphome
+
+    if ! docker volume ls | grep -w "${STACK_NAME}_esphome" 1>&2 ; then
+        export SERVICE_CONFIG_ESPHOME_INIT=${TECHNOCORE_SERVICES}/esphome/init.yml
+    fi
 fi
 #set_service_flag $service_name yes
 

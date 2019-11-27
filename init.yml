@@ -1,0 +1,24 @@
+version: "3.5"
+volumes:
+  esphome:
+
+services:
+
+  esphome_volume_init:
+    deploy:
+      mode: global
+      restart_policy:
+        condition: any
+    environment:
+      - STACK_NAME=${STACK_NAME}
+    command: >
+      bash -c "chown -R 1000:1000 /mnt/esphome && docker service rm ${STACK_NAME}_esphome_volume_init"
+
+    image: ${image_provider:-scififarms}/technocore:${TAG:-latest}
+    logging:
+      driver: "${LOGGING_DRIVER}"
+      options:
+        tag: "{{.Name}}"
+    volumes:
+      - esphome:/mnt/esphome
+      - /var/run/docker.sock:/var/run/docker.sock
