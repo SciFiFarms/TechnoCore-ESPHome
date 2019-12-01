@@ -42,6 +42,9 @@ services:
         reservations:
           memory: 64M
     environment:
+      # mDNS requires extra network permissions. Instead, I can use ping.
+      # https://github.com/esphome/issues/issues/641#issuecomment-534156628
+      - ESPHOME_DASHBOARD_USE_PING=true
       - image_provider=${image_provider:-scififarms}
       - STACK_NAME=${STACK_NAME:-technocore}
       - service_name=esphome
