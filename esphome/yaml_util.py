@@ -20,6 +20,7 @@ from esphome.core import CORE
 import paho.mqtt.client
 import hvac
 import ssl
+import re
 #import ptvsd
 
 _LOGGER = logging.getLogger(__name__)
@@ -272,6 +273,16 @@ class ESPHomeLoader(yaml.SafeLoader):  # pylint: disable=too-many-ancestors
         return os.path.splitext(os.path.basename(filename))[0]
 
     @_add_data_ref
+    def construct_device_id(self, node):
+        #filename = node.start_mark.name
+        #return os.path.splitext(os.path.basename(filepath))[0]
+
+        filename = self.construct_device_name(node)
+        regex_for_id = re.compile("(\d+)")
+        result = regex_for_id.search(filename)
+        return result.group(1)   
+
+    @_add_data_ref
     def construct_mqtt_username(self, node):
         return self.construct_device_name(node)
 
@@ -328,6 +339,7 @@ ESPHomeLoader.add_constructor('!force', ESPHomeLoader.construct_force)
 
 # Added for TechnoCore credential generation
 ESPHomeLoader.add_constructor('!gen_device_name', ESPHomeLoader.construct_device_name)
+ESPHomeLoader.add_constructor('!gen_device_id', ESPHomeLoader.construct_device_id)
 ESPHomeLoader.add_constructor('!gen_mqtt_username', ESPHomeLoader.construct_mqtt_username)
 ESPHomeLoader.add_constructor('!gen_mqtt_password', ESPHomeLoader.construct_mqtt_password)
 ESPHomeLoader.add_constructor('!gen_mqtt_broker', ESPHomeLoader.construct_mqtt_broker)
