@@ -18,6 +18,8 @@ services:
       labels:
         - traefik.frontend.rule=$ESPHOME_ROUTING_LABEL
         - traefik.frontend.priority=$ESPHOME_ROUTING_LABEL_PRIORITY
+        # This is also set as an ENV so that the wrapper can use socat to 
+        # automatically forward traffic to the actual service.
         - traefik.port=6052
         - ${TRAEFIK_BASIC_AUTH}
         - traefik.enable=true
@@ -48,6 +50,7 @@ services:
       - image_provider=${image_provider:-scififarms}
       - STACK_NAME=${STACK_NAME:-technocore}
       - service_name=esphome
+        # This is also set in the Traefik labels.
       - SERVICE_PORT=6052
       - TAG=${TAG:-latest}
       # This is used to allow the wrapper to mount the /config folder to the correct place on the host.
