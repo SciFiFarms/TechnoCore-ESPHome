@@ -266,6 +266,8 @@ class OrFilter : public Filter {
 class CalibrateLinearFilter : public Filter {
  public:
   CalibrateLinearFilter(float slope, float bias);
+  void set_slope(float slope);
+  void set_bias(float bias);
   optional<float> new_value(float value) override;
 
  protected:

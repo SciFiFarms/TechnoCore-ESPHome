@@ -46,6 +46,8 @@ upload_flags =
 """, """
 ; ========= YOU CAN EDIT AFTER THIS LINE =========
 
+; TODO: This should be optional?
+build_unflags = -fno-rtti
 """)
 
 UPLOAD_SPEED_OVERRIDE = {

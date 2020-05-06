@@ -269,6 +269,8 @@ float HeartbeatFilter::get_setup_priority() const { return setup_priority::HARDW
 
 optional<float> CalibrateLinearFilter::new_value(float value) { return value * this->slope_ + this->bias_; }
 CalibrateLinearFilter::CalibrateLinearFilter(float slope, float bias) : slope_(slope), bias_(bias) {}
+void CalibrateLinearFilter::set_slope(float slope) {this->slope_ = slope;}
+void CalibrateLinearFilter::set_bias(float bias) {this->bias_ = bias;}
 
 optional<float> CalibratePolynomialFilter::new_value(float value) {
   float res = 0.0f;
