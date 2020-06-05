@@ -6,6 +6,7 @@ networks:
 
 volumes:
   esphome:
+  esphome-build:
 
 services:
   ## Uncomment this if Traefik will be used for routing traffick to this service.
@@ -79,7 +80,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - $ESPHOME_VOLUME:/config
+      - ${DEV_MOUNT_ESPHOME_ESPHOME:-$EMPTY_MOUNT}
       # TODO: These don't seem needed?
       #- ./esphome-core:/esphome-core
-      #- esphome-build:/tmp/esphome-build/
+      - esphome-build:/tmp/esphome-build/
     user: "0" # I suspect I'll be able to remove this. I'd like to do that. 

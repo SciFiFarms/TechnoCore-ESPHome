@@ -26,6 +26,8 @@ fi
 # https://prefix.some.domain/
 # prefix=$service_name
 
+generate_mount dev esphome /usr/src/app/esphome
+
 set_optional_service home-assistant
 set_optional_service vernemq
 set_optional_service vault
