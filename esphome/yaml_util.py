@@ -274,13 +274,17 @@ class ESPHomeLoader(yaml.SafeLoader):  # pylint: disable=too-many-ancestors
 
     @_add_data_ref
     def construct_device_id(self, node):
-        #filename = node.start_mark.name
-        #return os.path.splitext(os.path.basename(filepath))[0]
-
         filename = self.construct_device_name(node)
         regex_for_id = re.compile("(\d+)")
         result = regex_for_id.search(filename)
         return result.group(1)   
+
+    @_add_data_ref
+    def construct_delay(self, node):
+        filename = self.construct_device_name(node)
+        regex_for_id = re.compile("(\d+)")
+        result = regex_for_id.search(filename)
+        return f"{ float(result.group(1)) * float(node.value) }s"
 
     @_add_data_ref
     def construct_mqtt_username(self, node):
@@ -340,6 +344,7 @@ ESPHomeLoader.add_constructor('!force', ESPHomeLoader.construct_force)
 # Added for TechnoCore credential generation
 ESPHomeLoader.add_constructor('!gen_device_name', ESPHomeLoader.construct_device_name)
 ESPHomeLoader.add_constructor('!gen_device_id', ESPHomeLoader.construct_device_id)
+ESPHomeLoader.add_constructor('!gen_delay', ESPHomeLoader.construct_delay)
 ESPHomeLoader.add_constructor('!gen_mqtt_username', ESPHomeLoader.construct_mqtt_username)
 ESPHomeLoader.add_constructor('!gen_mqtt_password', ESPHomeLoader.construct_mqtt_password)
 ESPHomeLoader.add_constructor('!gen_mqtt_broker', ESPHomeLoader.construct_mqtt_broker)
