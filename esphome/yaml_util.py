@@ -292,9 +292,6 @@ class ESPHomeLoader(yaml.SafeLoader):  # pylint: disable=too-many-ancestors
 
     @_add_data_ref
     def construct_mqtt_password(self, node):
-        #ptvsd.enable_attach()
-        #ptvsd.wait_for_attach()
-
         client = paho.mqtt.client.Client(client_id='esphomeyaml', clean_session=False)
         client.username_pw_set(os.environ['MQTT_USERNAME'],os.environ['MQTT_PASSWORD'] )
 
@@ -310,6 +307,23 @@ class ESPHomeLoader(yaml.SafeLoader):  # pylint: disable=too-many-ancestors
             hal_mqtt_password = "sanitized_password"
 
         return hal_mqtt_password
+
+    @_add_data_ref
+    def construct_debug(self, node):
+        print("Construct_debug")
+        if os.environ.get('DEBUG'):
+            import ptvsd
+            print("Starting debugging.")
+            ptvsd_port = os.environ.get("DEBUG_PORT", 5678)
+            print(ptvsd_port)
+            try:
+                ptvsd.enable_attach(address=("0.0.0.0", ptvsd_port))
+                ptvsd.wait_for_attach()
+                print("Started ptvsd at port %s." % ptvsd_port)
+            except OSError:
+                print("ptvsd port %s already in use." % ptvsd_port)
+            breakpoint()
+        return "2"
 
     @_add_data_ref
     def construct_mqtt_broker(self, node):
@@ -348,6 +362,7 @@ ESPHomeLoader.add_constructor('!gen_delay', ESPHomeLoader.construct_delay)
 ESPHomeLoader.add_constructor('!gen_mqtt_username', ESPHomeLoader.construct_mqtt_username)
 ESPHomeLoader.add_constructor('!gen_mqtt_password', ESPHomeLoader.construct_mqtt_password)
 ESPHomeLoader.add_constructor('!gen_mqtt_broker', ESPHomeLoader.construct_mqtt_broker)
+ESPHomeLoader.add_constructor('!debug', ESPHomeLoader.construct_debug)
 
 
 def load_yaml(fname):
