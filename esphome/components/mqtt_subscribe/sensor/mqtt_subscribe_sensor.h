@@ -16,6 +16,7 @@ class MQTTSubscribeSensor : public sensor::Sensor, public Component {
   float get_setup_priority() const override;
 
   void set_qos(uint8_t qos);
+  void set_initial_value(float initial_value);
 
  protected:
   mqtt::MQTTClientComponent *parent_;
