@@ -2,7 +2,9 @@
 
 #include "esphome/core/component.h"
 #include "esphome/components/gpio/switch/gpio_switch.h"
-#include "esphome/components/switch/switch.h"
+#include "esphome/components/mqtt/custom_mqtt_device.h"
+
+static const char *TAG = "dosage_switch";
 
 namespace esphome {
 namespace dosage {

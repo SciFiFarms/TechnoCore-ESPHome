@@ -4,9 +4,6 @@
 namespace esphome {
 namespace dosage {
 
-static const char *TAG = "dosage.switch";
-
-
 void DosageSwitch::dump_config() { LOG_SWITCH("", "Dosage Switch", this); }
 void DosageSwitch::setup() {
   this->GPIOSwitch::setup();
