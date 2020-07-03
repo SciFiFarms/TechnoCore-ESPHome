@@ -1,6 +1,8 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import gpio, switch
+from esphome.components import switch
+from esphome.components.gpio.switch import CONFIG_SCHEMA 
+
 # TODO: CONF_DOSAGE_DEFAULT isn't in esphome.const.
 from esphome.const import CONF_ID, CONF_DOSAGE_DEFAULT
 # TODO: These were copied from gpio.switch.
@@ -11,7 +13,7 @@ DosageSwitch = dosage_ns.class_('DosageSwitch', switch.Switch, cg.Component)
 
 DEFAULT_DOSAGE = 2001
 
-CONFIG_SCHEMA = gpio.switch.CONFIG_SCHEMA.extend({
+CONFIG_SCHEMA = CONFIG_SCHEMA.extend({
     cv.GenerateID(): cv.declare_id(DosageSwitch),
     cv.Optional(CONF_DOSAGE_DEFAULT, default=DEFAULT_DOSAGE): cv.uint16_t,
 }).extend(cv.COMPONENT_SCHEMA)
