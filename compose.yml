@@ -58,7 +58,7 @@ services:
       - host_working_dir=$PWD
       #- debug=${esphome_debug}
       - esphome_core=./esphome-core:/esphome-core
-      - esphome_app=${esphome_app_live_mount}
+      - esphome_app=${DEV_MOUNT_ESPHOME_ESPHOME:-$EMPTY_MOUNT}
       - TECHNOCORE_ROOT=${TECHNOCORE_ROOT}
       - MQTT_USERNAME=esphome
       # TODO: Have the python read the secrets file rather than the env.
@@ -66,6 +66,8 @@ services:
       - MQTT_BROKER=mqtt.$DOMAIN
       - VAULT_TOKEN={{"{{DOCKER-SECRET:vault_token}}"}}
       - VOLUME=$ESPHOME_VOLUME
+      - DEBUG=${DEBUG_ESPHOME}
+      - DEBUG_PORT=6051
       # Sometimes you have to pass in ${DOMAIN} to enable the correct link paths to be generated.
       # Othertimes you can use http:// or https:// for the website. Weird trick.
     image: ${image_provider:-scififarms}/technocore-esphome-wrapper:${TAG:-latest}

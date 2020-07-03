@@ -21,7 +21,6 @@ import paho.mqtt.client
 import hvac
 import ssl
 import re
-#import ptvsd
 
 _LOGGER = logging.getLogger(__name__)
 
