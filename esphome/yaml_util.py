@@ -21,6 +21,7 @@ import paho.mqtt.client
 import hvac
 import ssl
 import re
+import string
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -266,28 +267,51 @@ class ESPHomeLoader(yaml.SafeLoader):  # pylint: disable=too-many-ancestors
         return Lambda(text_type(node.value))
     
     # Begin additions for TechnoCore
+    def get_device_name(self):
+        return CORE.config_filename.replace(".yaml", "").replace(".yml", "")
+    def make_friendly(self, name):
+        return string.capwords(name.replace("_", " "))
+
     @_add_data_ref
     def construct_device_name(self, node):
-        filename = node.start_mark.name
-        return os.path.splitext(os.path.basename(filename))[0]
+        return self.get_device_name()
 
     @_add_data_ref
     def construct_device_id(self, node):
-        filename = self.construct_device_name(node)
         regex_for_id = re.compile("(\d+)")
-        result = regex_for_id.search(filename)
+        result = regex_for_id.search(self.get_device_name())
         return result.group(1)   
 
     @_add_data_ref
+    def construct_system(self, node):
+        regex_for_id = re.compile("(.*\d+)")
+        result = regex_for_id.search(self.get_device_name())
+        return result.group(1)
+    @_add_data_ref
+    def construct_system_friendly(self, node):
+        regex_for_id = re.compile("(.*\d+)")
+        result = regex_for_id.search(self.get_device_name())
+        return self.make_friendly(result.group(1))
+    @_add_data_ref
+    def construct_subsystem(self, node):
+        regex_for_id = re.compile(".*\d+_(.*)")
+        result = regex_for_id.search(self.get_device_name())
+        return result.group(1)
+    @_add_data_ref
+    def construct_subsystem_friendly(self, node):
+        regex_for_id = re.compile(".*\d+_(.*)")
+        result = regex_for_id.search(self.get_device_name())
+        return self.make_friendly(result.group(1))
+
+    @_add_data_ref
     def construct_delay(self, node):
-        filename = self.construct_device_name(node)
         regex_for_id = re.compile("(\d+)")
-        result = regex_for_id.search(filename)
+        result = regex_for_id.search(self.get_device_name())
         return f"{ float(result.group(1)) * float(node.value) }s"
 
     @_add_data_ref
     def construct_mqtt_username(self, node):
-        return self.construct_device_name(node)
+        return self.get_device_name()
 
     @_add_data_ref
     def construct_mqtt_password(self, node):
@@ -296,7 +320,7 @@ class ESPHomeLoader(yaml.SafeLoader):  # pylint: disable=too-many-ancestors
 
         client.connect(host='mqtt', port=1883)
 
-        hal_mqtt_username = self.construct_device_name(node)
+        hal_mqtt_username = self.get_device_name()
         if CORE.command in ["compile", "run"]:
             vault_client = hvac.Client(url='http://vault:8200', token=os.environ['VAULT_TOKEN'])
             vault_client.token = os.environ['VAULT_TOKEN']
@@ -357,6 +381,10 @@ ESPHomeLoader.add_constructor('!force', ESPHomeLoader.construct_force)
 # Added for TechnoCore credential generation
 ESPHomeLoader.add_constructor('!gen_device_name', ESPHomeLoader.construct_device_name)
 ESPHomeLoader.add_constructor('!gen_device_id', ESPHomeLoader.construct_device_id)
+ESPHomeLoader.add_constructor('!gen_system', ESPHomeLoader.construct_system)
+ESPHomeLoader.add_constructor('!gen_system_friendly', ESPHomeLoader.construct_system_friendly)
+ESPHomeLoader.add_constructor('!gen_subsystem', ESPHomeLoader.construct_subsystem)
+ESPHomeLoader.add_constructor('!gen_subsystem_friendly', ESPHomeLoader.construct_subsystem_friendly)
 ESPHomeLoader.add_constructor('!gen_delay', ESPHomeLoader.construct_delay)
 ESPHomeLoader.add_constructor('!gen_mqtt_username', ESPHomeLoader.construct_mqtt_username)
 ESPHomeLoader.add_constructor('!gen_mqtt_password', ESPHomeLoader.construct_mqtt_password)
