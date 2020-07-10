@@ -284,22 +284,22 @@ class ESPHomeLoader(yaml.SafeLoader):  # pylint: disable=too-many-ancestors
 
     @_add_data_ref
     def construct_system(self, node):
-        regex_for_id = re.compile("(.*\d+)")
+        regex_for_id = re.compile("(.*?\d+)")
         result = regex_for_id.search(self.get_device_name())
         return result.group(1)
     @_add_data_ref
     def construct_system_friendly(self, node):
-        regex_for_id = re.compile("(.*\d+)")
+        regex_for_id = re.compile("(.*?\d+)")
         result = regex_for_id.search(self.get_device_name())
         return self.make_friendly(result.group(1))
     @_add_data_ref
     def construct_subsystem(self, node):
-        regex_for_id = re.compile(".*\d+_(.*)")
+        regex_for_id = re.compile(".*?\d+_(.*)")
         result = regex_for_id.search(self.get_device_name())
         return result.group(1)
     @_add_data_ref
     def construct_subsystem_friendly(self, node):
-        regex_for_id = re.compile(".*\d+_(.*)")
+        regex_for_id = re.compile(".*?\d+_(.*)")
         result = regex_for_id.search(self.get_device_name())
         return self.make_friendly(result.group(1))
 
