@@ -19,8 +19,15 @@ void DosageSwitch::setup() {
 void DosageSwitch::dose_for_ms(uint32_t time_in_ms) {
   ESP_LOGD(TAG,"Dosing for %d ms", time_in_ms);
   this->turn_on();
-  delay(time_in_ms);
-  this->turn_off();
+  if(this->exact_timing_) {
+    delay(time_in_ms);
+    this->turn_off();
+  }
+  else {
+    this->set_timeout(time_in_ms, [this]() {
+      this->turn_off();
+    });
+  }
 }
 
 void DosageSwitch::dose_for_seconds(uint32_t time_in_seconds) {

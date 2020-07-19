@@ -10,9 +10,10 @@ from esphome.const import CONF_INTERLOCK, CONF_PIN, CONF_RESTORE_MODE, CONF_HUMI
 from .. import dosage_ns
 
 import re
-DEPENDENCIES = ['mqtt']
+
 DEFAULT_DOSAGE = "2s"
 CONF_MQTT_PARENT_ID = 'mqtt_parent_id'
+CONF_EXACT_TIMING = 'exact_timing'
 
 DosageSwitch = dosage_ns.class_('DosageSwitch', switch.Switch, cg.Component)
 
@@ -20,6 +21,7 @@ CONFIG_SCHEMA = CONFIG_SCHEMA.extend({
     cv.GenerateID(): cv.declare_id(DosageSwitch),
     cv.Optional(CONF_DOSAGE_SENSOR, default={CONF_NAME: "Default"}): sensor.sensor_schema("ms", "mdi:mdiBeakerOutline", 0),
     cv.Optional(CONF_DOSAGE, default=DEFAULT_DOSAGE): cv.positive_time_period_milliseconds,
+    cv.Optional(CONF_EXACT_TIMING, default=False): cv.boolean,
 }).extend(cv.COMPONENT_SCHEMA)
 
 def get_topic(suffix, config):
@@ -53,6 +55,9 @@ def to_code(config):
     cg.add(var.set_pin(pin))
 
     cg.add(var.set_restore_mode(config[CONF_RESTORE_MODE]))
+
+    if CONF_EXACT_TIMING in config:
+        cg.add(var.set_exact_timing(config[CONF_EXACT_TIMING]))
 
     if CONF_INTERLOCK in config:
         interlock = []

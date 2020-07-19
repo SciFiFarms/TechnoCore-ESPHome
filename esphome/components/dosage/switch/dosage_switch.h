@@ -1,7 +1,7 @@
 #pragma once
 
 #include "esphome/core/component.h"
-#include "esphome/components/gpio/switch/gpio_switch.h"
+#include "esphome/components/dosage/switch/gpio_switch.h"
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/mqtt/custom_mqtt_device.h"
 
@@ -32,6 +32,7 @@ class DosageSwitch : public gpio::GPIOSwitch, public mqtt::CustomMQTTDevice {
     dosage_->publish_state(dosage); 
   }
   void set_sensor(sensor::Sensor *sensor) { dosage_ = sensor; }
+  void set_exact_timing(bool exact_timing) { exact_timing_ = exact_timing; }
 
   void set_topic_dose(std::string topic_dose ) { this->topic_dose = topic_dose; }
   void set_topic_set_dosage(std::string topic_set_dosage ) { this->topic_set_dosage = topic_set_dosage; }
@@ -40,6 +41,7 @@ class DosageSwitch : public gpio::GPIOSwitch, public mqtt::CustomMQTTDevice {
 
  protected:
   sensor::Sensor *dosage_{nullptr};
+  bool exact_timing_;
   std::string topic_dose_for_seconds;
   std::string topic_dose_for_ms;
   std::string topic_set_dosage;
