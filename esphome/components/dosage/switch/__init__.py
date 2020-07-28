@@ -2,6 +2,7 @@ import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import switch, sensor, mqtt
 from esphome.core import CORE
+import esphome.components.gpio.switch as gpio_switch
 
 # TODO: CONF_DOSAGE_DEFAULT isn't in esphome.const.
 from esphome.const import CONF_ID, CONF_DOSAGE, CONF_DOSAGE_SENSOR, CONF_MQTT_ID
@@ -19,7 +20,7 @@ CONF_EXACT_TIMING = 'exact_timing'
 
 DosageSwitch = dosage_ns.class_('DosageSwitch', gpio_switch.GPIOSwitch, cg.Component)
 
-CONFIG_SCHEMA = CONFIG_SCHEMA.extend({
+CONFIG_SCHEMA = gpio_switch.CONFIG_SCHEMA.extend({
     cv.GenerateID(): cv.declare_id(DosageSwitch),
     cv.Optional(CONF_DOSAGE_SENSOR, default={CONF_NAME: "Default"}): sensor.sensor_schema("ms", "mdi:mdiBeakerOutline", 0),
     cv.Optional(CONF_DOSAGE, default=DEFAULT_DOSAGE): cv.positive_time_period_milliseconds,
