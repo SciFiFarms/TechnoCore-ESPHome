@@ -1,7 +1,7 @@
 #pragma once
 
 #include "esphome/core/component.h"
-#include "esphome/components/dosage/switch/gpio_switch.h"
+#include "esphome/components/gpio/switch/gpio_switch.h"
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/mqtt/custom_mqtt_device.h"
 

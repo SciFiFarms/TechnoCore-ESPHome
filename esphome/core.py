@@ -527,6 +527,8 @@ class EsphomeCore:
         # Whether ESPHome was started in verbose mode
         self.verbose = False
 
+        self.extra_source_files = {}
+
         self.command = None
 
     def reset(self):

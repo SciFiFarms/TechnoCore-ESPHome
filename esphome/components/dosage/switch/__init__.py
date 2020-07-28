@@ -1,7 +1,7 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import switch, sensor, mqtt
-from esphome.components.gpio.switch import CONFIG_SCHEMA 
+from esphome.core import CORE
 
 # TODO: CONF_DOSAGE_DEFAULT isn't in esphome.const.
 from esphome.const import CONF_ID, CONF_DOSAGE, CONF_DOSAGE_SENSOR, CONF_MQTT_ID
@@ -10,12 +10,14 @@ from esphome.const import CONF_INTERLOCK, CONF_PIN, CONF_RESTORE_MODE, CONF_HUMI
 from .. import dosage_ns
 
 import re
+DEPENDENCIES = ['mqtt']
+IS_PLATFORM_COMPONENT = True
 
 DEFAULT_DOSAGE = "2s"
 CONF_MQTT_PARENT_ID = 'mqtt_parent_id'
 CONF_EXACT_TIMING = 'exact_timing'
 
-DosageSwitch = dosage_ns.class_('DosageSwitch', switch.Switch, cg.Component)
+DosageSwitch = dosage_ns.class_('DosageSwitch', gpio_switch.GPIOSwitch, cg.Component)
 
 CONFIG_SCHEMA = CONFIG_SCHEMA.extend({
     cv.GenerateID(): cv.declare_id(DosageSwitch),
@@ -34,6 +36,11 @@ def get_topic(suffix, config):
     return f"{ TOPIC_PREFIX }/{ system_id }/{ subsystem_id }/{ suffix }"
 
 def to_code(config):
+    # TODO: Seems like there should be a more object oriented way to do this.
+    # Include the gpio_switch code incase a gpio.switch isn't used.
+    CORE.extra_source_files.update({'esphome/components/gpio/switch/gpio_switch.h': '/usr/src/app/esphome/components/gpio/switch/gpio_switch.h'})
+    CORE.extra_source_files.update({'esphome/components/gpio/switch/gpio_switch.cpp': '/usr/src/app/esphome/components/gpio/switch/gpio_switch.cpp'})
+
     var = cg.new_Pvariable(config[CONF_ID])
     yield cg.register_component(var, config)
     yield switch.register_switch(var, config)

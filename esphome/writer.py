@@ -313,7 +313,7 @@ or use the custom_components folder.
 
 
 def copy_src_tree():
-    source_files = {}
+    source_files = CORE.extra_source_files
     for _, component, _ in iter_components(CORE.config):
         source_files.update(component.source_files)
 
