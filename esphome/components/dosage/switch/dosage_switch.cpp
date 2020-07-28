@@ -18,14 +18,14 @@ void DosageSwitch::setup() {
 
 void DosageSwitch::dose_for_ms(uint32_t time_in_ms) {
   ESP_LOGD(TAG,"Dosing for %d ms", time_in_ms);
-  this->turn_on();
+  this->toggle();
   if(this->exact_timing_) {
     delay(time_in_ms);
-    this->turn_off();
+    this->toggle();
   }
   else {
-    this->set_timeout(time_in_ms, [this]() {
-      this->turn_off();
+    this->set_timeout(this->dosage_->get_object_id(), time_in_ms, [this]() {
+      this->toggle();
     });
   }
 }
@@ -38,6 +38,15 @@ void DosageSwitch::dose_for_seconds(uint32_t time_in_seconds) {
 
 void DosageSwitch::dose(){
   this->dose_for_ms((this->dosage_->state));
+}
+
+void DosageSwitch::cancel_dose(){
+  // cancel_timeout returns true if a timeout was cancelled. 
+  if(this->cancel_timeout(this->dosage_->get_object_id()))
+  {
+    // Only toggle if there was an existing timeout.
+    this->toggle();
+  }
 }
 
 }  // namespace dosage

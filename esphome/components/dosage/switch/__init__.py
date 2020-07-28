@@ -57,14 +57,14 @@ def to_code(config):
     cg.add(var.set_topic_dose(get_topic("dose", config)))
     cg.add(var.set_topic_set_dosage(get_topic("set_dosage", config)))
 
+    if CONF_EXACT_TIMING in config:
+        cg.add(var.set_exact_timing(config[CONF_EXACT_TIMING]))
+
     # TODO: Everything below here came from GPIOSwitch. It'd be better to find a way to use this DRYly. 
     pin = yield cg.gpio_pin_expression(config[CONF_PIN])
     cg.add(var.set_pin(pin))
 
     cg.add(var.set_restore_mode(config[CONF_RESTORE_MODE]))
-
-    if CONF_EXACT_TIMING in config:
-        cg.add(var.set_exact_timing(config[CONF_EXACT_TIMING]))
 
     if CONF_INTERLOCK in config:
         interlock = []

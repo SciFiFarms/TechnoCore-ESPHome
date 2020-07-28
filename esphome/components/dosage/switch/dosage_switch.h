@@ -39,6 +39,9 @@ class DosageSwitch : public gpio::GPIOSwitch, public mqtt::CustomMQTTDevice {
   void set_topic_dose_for_ms(std::string topic_dose_for_ms ) { this->topic_dose_for_ms = topic_dose_for_ms; }
   void set_topic_dose_for_seconds(std::string topic_dose_for_seconds ) { this->topic_dose_for_seconds = topic_dose_for_seconds; }
 
+  void cancel_dose();
+  uint32_t get_dosage() { return this->dosage_->state; }
+
  protected:
   sensor::Sensor *dosage_{nullptr};
   bool exact_timing_;
