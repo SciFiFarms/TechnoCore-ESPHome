@@ -18,14 +18,14 @@ void DosageSwitch::setup() {
 
 void DosageSwitch::dose_for_ms(uint32_t time_in_ms) {
   ESP_LOGD(TAG,"Dosing %s for %d ms", this->get_name().c_str(), time_in_ms);
-  this->toggle();
+  this->turn_on();
   if(this->exact_timing_) {
     delay(time_in_ms);
-    this->toggle();
+    this->turn_off();
   }
   else {
     this->set_timeout(this->dosage_->get_object_id(), time_in_ms, [this]() {
-      this->toggle();
+      this->turn_off();
     });
   }
 }
