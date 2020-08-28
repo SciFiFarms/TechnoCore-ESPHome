@@ -7,7 +7,7 @@ import esphome.components.gpio.switch as gpio_switch
 # TODO: CONF_DOSAGE_DEFAULT isn't in esphome.const.
 from esphome.const import CONF_ID, CONF_DOSAGE, CONF_DOSAGE_SENSOR, CONF_MQTT_ID
 # TODO: These were copied from gpio.switch.
-from esphome.const import CONF_INTERLOCK, CONF_PIN, CONF_RESTORE_MODE, CONF_HUMIDITY, CONF_NAME, CONF_COMMAND_TOPIC, CONF_MQTT
+from esphome.const import CONF_INTERLOCK, CONF_PIN, CONF_RESTORE_MODE, CONF_HUMIDITY, CONF_NAME, CONF_COMMAND_TOPIC, CONF_MQTT, CONF_MQTT_PARENT_ID 
 from .. import dosage_ns
 
 import re
@@ -15,7 +15,6 @@ DEPENDENCIES = ['mqtt']
 IS_PLATFORM_COMPONENT = True
 
 DEFAULT_DOSAGE = "2s"
-CONF_MQTT_PARENT_ID = 'mqtt_parent_id'
 CONF_EXACT_TIMING = 'exact_timing'
 
 DosageSwitch = dosage_ns.class_('DosageSwitch', gpio_switch.GPIOSwitch, cg.Component)

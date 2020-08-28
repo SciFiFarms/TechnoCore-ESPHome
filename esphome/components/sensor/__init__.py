@@ -8,8 +8,8 @@ from esphome.const import CONF_ABOVE, CONF_ACCURACY_DECIMALS, CONF_ALPHA, CONF_B
     CONF_EXPIRE_AFTER, CONF_FILTERS, CONF_FROM, CONF_ICON, CONF_ID, CONF_INTERNAL, \
     CONF_ON_RAW_VALUE, CONF_ON_VALUE, CONF_ON_VALUE_RANGE, CONF_SEND_EVERY, CONF_SEND_FIRST_AT, \
     CONF_TO, CONF_TRIGGER_ID, CONF_UNIT_OF_MEASUREMENT, CONF_WINDOW_SIZE, CONF_NAME, CONF_MQTT_ID, \
-    CONF_FORCE_UPDATE
-from esphome.core import CORE, coroutine, coroutine_with_priority
+    CONF_FORCE_UPDATE, CONF_TOPIC, CONF_QOS, CONF_CALIBRATION_SENSOR, CONF_MQTT_PARENT_ID, CONF_DATAPOINTS, CONF_RAW, UNIT_RAW
+
 from esphome.util import Registry
 
 CODEOWNERS = ['@esphome/core']
@@ -211,8 +211,8 @@ def validate_not_all_from_same(config):
 @FILTER_REGISTRY.register('calibrate_linear', CalibrateLinearFilter, cv.All(
     cv.ensure_list(validate_datapoint), cv.Length(min=2), validate_not_all_from_same))
 def calibrate_linear_filter_to_code(config, filter_id):
-    x = [conf[CONF_FROM] for conf in config]
-    y = [conf[CONF_TO] for conf in config]
+    x = [conf[CONF_FROM] for conf in config[CONF_DATAPOINTS]]
+    y = [conf[CONF_TO] for conf in config[CONF_DATAPOINTS]]
     k, b = fit_linear(x, y)
     yield cg.new_Pvariable(filter_id, k, b)
 

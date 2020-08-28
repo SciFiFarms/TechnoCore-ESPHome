@@ -1,12 +1,11 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import text_sensor, mqtt
-from esphome.const import CONF_ID, CONF_QOS, CONF_TOPIC
+from esphome.const import CONF_ID, CONF_QOS, CONF_TOPIC, CONF_MQTT_PARENT_ID
 from .. import mqtt_subscribe_ns
 
 DEPENDENCIES = ['mqtt']
 
-CONF_MQTT_PARENT_ID = 'mqtt_parent_id'
 MQTTSubscribeTextSensor = mqtt_subscribe_ns.class_('MQTTSubscribeTextSensor',
                                                    text_sensor.TextSensor, cg.Component)
 

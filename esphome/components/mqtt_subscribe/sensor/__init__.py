@@ -1,12 +1,11 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import mqtt, sensor
-from esphome.const import CONF_ID, CONF_QOS, CONF_TOPIC, UNIT_EMPTY, ICON_EMPTY, CONF_INITIAL_VALUE
+from esphome.const import CONF_ID, CONF_QOS, CONF_TOPIC, UNIT_EMPTY, ICON_EMPTY, CONF_INITIAL_VALUE, CONF_MQTT_PARENT_ID
 from .. import mqtt_subscribe_ns
 
 DEPENDENCIES = ['mqtt']
 
-CONF_MQTT_PARENT_ID = 'mqtt_parent_id'
 MQTTSubscribeSensor = mqtt_subscribe_ns.class_('MQTTSubscribeSensor', sensor.Sensor, cg.Component)
 
 CONFIG_SCHEMA = sensor.sensor_schema(UNIT_EMPTY, ICON_EMPTY, 1).extend({
