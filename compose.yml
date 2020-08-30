@@ -6,7 +6,7 @@ networks:
 
 volumes:
   esphome:
-  esphome-build:
+  esphome-builds:
 
 services:
   ## Uncomment this if Traefik will be used for routing traffick to this service.
