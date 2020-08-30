@@ -268,12 +268,16 @@ void HeartbeatFilter::setup() {
 float HeartbeatFilter::get_setup_priority() const { return setup_priority::HARDWARE; }
 
 optional<float> CalibrateLinearFilter::new_value(float value) { 
+#ifdef USE_RAW_SENSOR
   if(this->raw_ != nullptr) {
     this->raw_->publish_state(value);
   }
+#endif
+
   return value * this->slope_ + this->bias_; 
 }
 CalibrateLinearFilter::CalibrateLinearFilter(float slope, float bias) : slope_(slope), bias_(bias) {}
+#ifdef USE_MQTT_CALIBRATION
 void CalibrateLinearFilter::initialize(Sensor *parent, Filter *next) {
   Filter::initialize(parent, next);
   if(this->calibration_ != nullptr) {
@@ -287,6 +291,7 @@ void CalibrateLinearFilter::initialize(Sensor *parent, Filter *next) {
     }, 1);
   } 
 }
+#endif
 void CalibrateLinearFilter::set_slope(float slope) {
   ESP_LOGI(TAG, "    Setting slope: %f", slope);
   this->slope_ = slope;

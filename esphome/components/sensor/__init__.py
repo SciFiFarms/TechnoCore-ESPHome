@@ -237,6 +237,7 @@ def calibrate_linear_filter_to_code(config, filter_id):
     linear_filter = yield cg.new_Pvariable(filter_id, k, b)
 
     if(config.get(CONF_CALIBRATION_SENSOR)):
+        cg.add_define('USE_MQTT_CALIBRATION')
         CORE.extra_source_files.update({'esphome/components/mqtt_subscribe/text_sensor/mqtt_subscribe_text_sensor.h': '/usr/src/app/esphome/components/mqtt_subscribe/text_sensor/mqtt_subscribe_text_sensor.h'})
         CORE.extra_source_files.update({'esphome/components/mqtt_subscribe/text_sensor/mqtt_subscribe_text_sensor.cpp': '/usr/src/app/esphome/components/mqtt_subscribe/text_sensor/mqtt_subscribe_text_sensor.cpp'})
         # TODO: This basically duplicates text_sensor.mqtt_subscribe. Should find a 
@@ -253,6 +254,7 @@ def calibrate_linear_filter_to_code(config, filter_id):
         cg.add(linear_filter.set_calibration_sensor(var))
 
     if(config.get(CONF_RAW)):
+        cg.add_define('USE_RAW_SENSOR')
         raw_sensor = yield new_sensor(config.get(CONF_RAW))
         cg.add(linear_filter.set_raw_sensor(raw_sensor))
 
