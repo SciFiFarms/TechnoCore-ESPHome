@@ -4,6 +4,8 @@ import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome import automation
 from esphome.components import mqtt
+from esphome.components.text_sensor import register_text_sensor
+from esphome.components.mqtt_subscribe import text_sensor
 from esphome.const import CONF_ABOVE, CONF_ACCURACY_DECIMALS, CONF_ALPHA, CONF_BELOW, \
     CONF_EXPIRE_AFTER, CONF_FILTERS, CONF_FROM, CONF_ICON, CONF_ID, CONF_INTERNAL, \
     CONF_ON_RAW_VALUE, CONF_ON_VALUE, CONF_ON_VALUE_RANGE, CONF_SEND_EVERY, CONF_SEND_FIRST_AT, \
@@ -11,6 +13,7 @@ from esphome.const import CONF_ABOVE, CONF_ACCURACY_DECIMALS, CONF_ALPHA, CONF_B
     CONF_FORCE_UPDATE, CONF_TOPIC, CONF_QOS, CONF_CALIBRATION_SENSOR, CONF_MQTT_PARENT_ID, CONF_DATAPOINTS, CONF_RAW, UNIT_RAW
 
 from esphome.util import Registry
+from esphome.core import CORE, coroutine, coroutine_with_priority
 
 CODEOWNERS = ['@esphome/core']
 IS_PLATFORM_COMPONENT = True
@@ -216,6 +219,9 @@ LINEAR_FILTER_SCHEMA = cv.Schema( {
         cv.Optional(CONF_UNIT_OF_MEASUREMENT, default=CONF_RAW): unit_of_measurement,
         cv.Optional(CONF_ACCURACY_DECIMALS, default=4): accuracy_decimals,
     }),
+    cv.Optional('calibration_sensor'): text_sensor.CONFIG_SCHEMA.extend({
+        cv.Optional(CONF_TOPIC): cv.subscribe_topic,
+    })
 })
 
 @FILTER_REGISTRY.register('calibrate_linear', CalibrateLinearFilter, LINEAR_FILTER_SCHEMA)
@@ -225,6 +231,20 @@ def calibrate_linear_filter_to_code(config, filter_id):
     k, b = fit_linear(x, y)
 
     linear_filter = yield cg.new_Pvariable(filter_id, k, b)
+
+    if(config.get(CONF_CALIBRATION_SENSOR)):
+        # TODO: This basically duplicates text_sensor.mqtt_subscribe. Should find a 
+        # way to either define to_code in such a way that it's callable from here.
+        var = cg.new_Pvariable(config[CONF_CALIBRATION_SENSOR][CONF_ID])
+        yield cg.register_component(var, config[CONF_CALIBRATION_SENSOR])
+        yield register_text_sensor(var, config[CONF_CALIBRATION_SENSOR])
+
+        parent = yield cg.get_variable(config[CONF_CALIBRATION_SENSOR][CONF_MQTT_PARENT_ID])
+        cg.add(var.set_parent(parent))
+        cg.add(var.set_topic(config[CONF_CALIBRATION_SENSOR][CONF_TOPIC]))
+        cg.add(var.set_qos(config[CONF_CALIBRATION_SENSOR][CONF_QOS]))
+
+        cg.add(linear_filter.set_calibration_sensor(var))
 
     if(config.get(CONF_RAW)):
         raw_sensor = yield new_sensor(config.get(CONF_RAW))

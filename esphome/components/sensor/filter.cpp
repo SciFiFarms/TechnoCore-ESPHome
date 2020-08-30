@@ -273,8 +273,28 @@ optional<float> CalibrateLinearFilter::new_value(float value) {
   }
   return value * this->slope_ + this->bias_; 
 }
-void CalibrateLinearFilter::set_slope(float slope) {this->slope_ = slope;}
-void CalibrateLinearFilter::set_bias(float bias) {this->bias_ = bias;}
+CalibrateLinearFilter::CalibrateLinearFilter(float slope, float bias) : slope_(slope), bias_(bias) {}
+void CalibrateLinearFilter::initialize(Sensor *parent, Filter *next) {
+  Filter::initialize(parent, next);
+  if(this->calibration_ != nullptr) {
+    std::string topic = this->calibration_->get_topic();
+    mqtt::global_mqtt_client->subscribe_json(topic, [this](const std::string &topic, JsonObject &payload){
+      ESP_LOGI(TAG, "Calibrating Linear Filter");
+      if (payload.containsKey("slope"))
+        this->set_slope(payload["slope"]);
+      if (payload.containsKey("bias"))
+        this->set_bias(payload["bias"]);
+    }, 1);
+  } 
+}
+void CalibrateLinearFilter::set_slope(float slope) {
+  ESP_LOGI(TAG, "    Setting slope: %f", slope);
+  this->slope_ = slope;
+}
+void CalibrateLinearFilter::set_bias(float bias) {
+  ESP_LOGI(TAG, "    Setting bias: %f", bias);
+  this->bias_ = bias;
+}
 
 optional<float> CalibratePolynomialFilter::new_value(float value) {
   float res = 0.0f;

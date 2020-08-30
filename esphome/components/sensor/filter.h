@@ -4,6 +4,7 @@
 #include "esphome/core/component.h"
 #include "esphome/core/helpers.h"
 
+#include "esphome/components/mqtt_subscribe/text_sensor/mqtt_subscribe_text_sensor.h"
 namespace esphome {
 namespace sensor {
 
@@ -269,12 +270,17 @@ class CalibrateLinearFilter : public Filter {
   void set_slope(float slope);
   void set_bias(float bias);
   optional<float> new_value(float value) override;
+  void initialize(Sensor *parent, Filter *next);
   void set_raw_sensor(Sensor* raw) { this->raw_ = raw; }
+  void set_calibration_sensor(mqtt_subscribe::MQTTSubscribeTextSensor* calibration) { this->calibration_ = calibration; }
+
+ protected:
+  Sensor *raw_{nullptr};
+  mqtt_subscribe::MQTTSubscribeTextSensor *calibration_{nullptr};
 
  protected:
   float slope_;
   float bias_;
-  Sensor *raw_{nullptr};
 };
 
 class CalibratePolynomialFilter : public Filter {
