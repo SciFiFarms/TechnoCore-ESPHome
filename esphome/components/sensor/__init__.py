@@ -215,6 +215,9 @@ def validate_not_all_from_same(config):
 
 
 LINEAR_FILTER_SCHEMA = cv.Schema( {
+    # TODO: Upstream this list is assigned to the filter. Couldn't figure out how 
+    # to mix that with the sensor settings, so I moved that to datapoints. It would 
+    # be nice to not have this be a breaking change. 
     cv.Required(CONF_DATAPOINTS): cv.All(cv.ensure_list(validate_datapoint), cv.Length(min=2), validate_not_all_from_same),
     cv.Optional(CONF_RAW): SENSOR_SCHEMA.extend({
         cv.Optional(CONF_UNIT_OF_MEASUREMENT, default=CONF_RAW): unit_of_measurement,
