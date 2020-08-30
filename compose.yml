@@ -85,5 +85,5 @@ services:
       - ${DEV_MOUNT_ESPHOME_ESPHOME:-$EMPTY_MOUNT}
       # TODO: These don't seem needed?
       #- ./esphome-core:/esphome-core
-      - esphome-build:/tmp/esphome-build/
+      - esphome-builds:/tmp/esphome-builds/
     user: "0" # I suspect I'll be able to remove this. I'd like to do that. 
