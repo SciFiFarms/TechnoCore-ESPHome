@@ -208,16 +208,30 @@ def validate_not_all_from_same(config):
     return config
 
 
-@FILTER_REGISTRY.register('calibrate_linear', CalibrateLinearFilter, cv.All(
-    cv.ensure_list(validate_datapoint), cv.Length(min=2), validate_not_all_from_same))
+
+
+LINEAR_FILTER_SCHEMA = cv.Schema( {
+    cv.Required(CONF_DATAPOINTS): cv.All(cv.ensure_list(validate_datapoint), cv.Length(min=2), validate_not_all_from_same),
+    cv.Optional(CONF_RAW): SENSOR_SCHEMA.extend({
+        cv.Optional(CONF_UNIT_OF_MEASUREMENT, default=CONF_RAW): unit_of_measurement,
+        cv.Optional(CONF_ACCURACY_DECIMALS, default=4): accuracy_decimals,
+    }),
+})
+
+@FILTER_REGISTRY.register('calibrate_linear', CalibrateLinearFilter, LINEAR_FILTER_SCHEMA)
 def calibrate_linear_filter_to_code(config, filter_id):
     x = [conf[CONF_FROM] for conf in config[CONF_DATAPOINTS]]
     y = [conf[CONF_TO] for conf in config[CONF_DATAPOINTS]]
     k, b = fit_linear(x, y)
-    yield cg.new_Pvariable(filter_id, k, b)
 
+    linear_filter = yield cg.new_Pvariable(filter_id, k, b)
 
-CONF_DATAPOINTS = 'datapoints'
+    if(config.get(CONF_RAW)):
+        raw_sensor = yield new_sensor(config.get(CONF_RAW))
+        cg.add(linear_filter.set_raw_sensor(raw_sensor))
+
+    yield linear_filter
+
 CONF_DEGREE = 'degree'
 
 

@@ -267,8 +267,12 @@ void HeartbeatFilter::setup() {
 }
 float HeartbeatFilter::get_setup_priority() const { return setup_priority::HARDWARE; }
 
-optional<float> CalibrateLinearFilter::new_value(float value) { return value * this->slope_ + this->bias_; }
-CalibrateLinearFilter::CalibrateLinearFilter(float slope, float bias) : slope_(slope), bias_(bias) {}
+optional<float> CalibrateLinearFilter::new_value(float value) { 
+  if(this->raw_ != nullptr) {
+    this->raw_->publish_state(value);
+  }
+  return value * this->slope_ + this->bias_; 
+}
 void CalibrateLinearFilter::set_slope(float slope) {this->slope_ = slope;}
 void CalibrateLinearFilter::set_bias(float bias) {this->bias_ = bias;}
 
