@@ -52,30 +52,6 @@ class Sensor : public Nameable {
    */
   void set_accuracy_decimals(int8_t accuracy_decimals);
 
-  /** Gets the first filter found of the templated type from the filter chain.
-   *
-   * This may look like:
-   *
-   *   CalibrateLinearFilter* filter = id(psi).get_filter<CalibrateLinearFilter>();
-   *   if(filter == nullptr) {
-   *     ESP_LOGW(TAG, "Could not find filter.");
-   *   } else {
-   *     ESP_LOGV(TAG, "Found filter! %s", typeid (filter).name());
-   *     filter->set_slope(x);
-   *   }
-   */
-  template <typename F>
-  F* get_filter() {
-    Filter *last_filter = this->filter_list_;
-    while (last_filter != nullptr) {
-      if(dynamic_cast<F*>(last_filter) != NULL) {
-        return (F*)last_filter;
-      }
-      last_filter = last_filter->next_;
-    }
-    return nullptr;
-  }
-
   /// Add a filter to the filter chain. Will be appended to the back.
   void add_filter(Filter *filter);
 
