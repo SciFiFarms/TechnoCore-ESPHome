@@ -528,10 +528,11 @@ def run_esphome(argv):
     for conf_path in args.configuration:
         CORE.config_path = conf_path
         CORE.dashboard = args.dashboard
-
-        config = read_config(dict(args.substitution) if args.substitution else {})
+        
         # Added so that the creds generator for TecnoCore knows if it should sanitize passwords or not. 
         CORE.command = args.command
+
+        config = read_config(dict(args.substitution) if args.substitution else {})
         
         if config is None:
             return 1

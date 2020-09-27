@@ -10,7 +10,7 @@ from esphome.const import CONF_ABOVE, CONF_ACCURACY_DECIMALS, CONF_ALPHA, CONF_B
     CONF_EXPIRE_AFTER, CONF_FILTERS, CONF_FROM, CONF_ICON, CONF_ID, CONF_INTERNAL, \
     CONF_ON_RAW_VALUE, CONF_ON_VALUE, CONF_ON_VALUE_RANGE, CONF_SEND_EVERY, CONF_SEND_FIRST_AT, \
     CONF_TO, CONF_TRIGGER_ID, CONF_UNIT_OF_MEASUREMENT, CONF_WINDOW_SIZE, CONF_NAME, CONF_MQTT_ID, \
-    CONF_FORCE_UPDATE, CONF_TOPIC, CONF_QOS, CONF_CALIBRATION_SENSOR, CONF_MQTT_PARENT_ID, CONF_DATAPOINTS, CONF_RAW, UNIT_RAW
+    CONF_FORCE_UPDATE, CONF_TOPIC, CONF_QOS, CONF_CALIBRATION_SENSOR, CONF_MQTT_PARENT_ID, CONF_DATAPOINTS, CONF_RAW, CONF_RAW_SENSOR, UNIT_RAW
 
 from esphome.util import Registry
 from esphome.core import CORE, coroutine, coroutine_with_priority
@@ -219,7 +219,7 @@ LINEAR_FILTER_SCHEMA = cv.Schema( {
     # to mix that with the sensor settings, so I moved that to datapoints. It would 
     # be nice to not have this be a breaking change. 
     cv.Required(CONF_DATAPOINTS): cv.All(cv.ensure_list(validate_datapoint), cv.Length(min=2), validate_not_all_from_same),
-    cv.Optional(CONF_RAW): SENSOR_SCHEMA.extend({
+    cv.Optional(CONF_RAW_SENSOR): SENSOR_SCHEMA.extend({
         cv.Optional(CONF_UNIT_OF_MEASUREMENT, default=CONF_RAW): unit_of_measurement,
         cv.Optional(CONF_ACCURACY_DECIMALS, default=4): accuracy_decimals,
     }),
@@ -253,9 +253,9 @@ def calibrate_linear_filter_to_code(config, filter_id):
 
         cg.add(linear_filter.set_calibration_sensor(var))
 
-    if(config.get(CONF_RAW)):
+    if(config.get(CONF_RAW_SENSOR)):
         cg.add_define('USE_RAW_SENSOR')
-        raw_sensor = yield new_sensor(config.get(CONF_RAW))
+        raw_sensor = yield new_sensor(config.get(CONF_RAW_SENSOR))
         cg.add(linear_filter.set_raw_sensor(raw_sensor))
 
     yield linear_filter

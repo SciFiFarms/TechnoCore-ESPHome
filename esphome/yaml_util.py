@@ -264,7 +264,7 @@ class ESPHomeLoader(yaml.SafeLoader):  # pylint: disable=too-many-ancestors
 
     @_add_data_ref
     def construct_lambda(self, node):
-        return Lambda(text_type(node.value))
+        return Lambda(str(node.value))
     
     # Begin additions for TechnoCore
     def get_device_name(self):

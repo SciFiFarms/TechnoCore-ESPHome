@@ -26,7 +26,7 @@ class DosageSwitch : public gpio::GPIOSwitch, public mqtt::CustomMQTTDevice {
   void setup() override;
   void dump_config() override;
   std::string component_type() const { return "switch"; }
-  std::string get_default_object_id() const { return sanitize_string_whitelist(to_lowercase_underscore(this->get_name()), HOSTNAME_CHARACTER_WHITELIST); }
+  std::string get_default_object_id() const { return sanitize_string_allowlist(to_lowercase_underscore(this->get_name()), HOSTNAME_CHARACTER_ALLOWLIST); }
   void set_dosage(uint32_t dosage) { 
     ESP_LOGD(TAG,"Updating dosage to be %d ms",dosage);
     dosage_->publish_state(dosage); 

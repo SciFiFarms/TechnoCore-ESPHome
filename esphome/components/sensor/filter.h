@@ -3,8 +3,8 @@
 #include <queue>
 #include "esphome/core/component.h"
 #include "esphome/core/helpers.h"
-#include "esphome/core/defines.h"
 
+#include "esphome/core/defines.h"
 #ifdef USE_MQTT_CALIBRATION
 #include "esphome/components/mqtt_subscribe/text_sensor/mqtt_subscribe_text_sensor.h"
 #endif
