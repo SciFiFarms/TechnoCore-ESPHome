@@ -39,6 +39,9 @@ void DosageSwitch::dose_for_seconds(uint32_t time_in_seconds) {
 void DosageSwitch::dose(){
   this->dose_for_ms((this->dosage_->state));
 }
+void DosageSwitch::dose(float times){
+  this->dose_for_ms((this->dosage_->state)*times);
+}
 
 void DosageSwitch::cancel_dose(){
   // cancel_timeout returns true if a timeout was cancelled. 

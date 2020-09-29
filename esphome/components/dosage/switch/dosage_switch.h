@@ -15,6 +15,7 @@ class DosageSwitch : public gpio::GPIOSwitch, public mqtt::CustomMQTTDevice {
   void dose_for_ms(uint32_t time_in_ms) ;
   void dose_for_seconds(uint32_t time_in_seconds) ;
   void dose();
+  void dose(float times);
 
   void on_dose_for_ms(const std::string &topic, const std::string &payload) { this->dose_for_ms(uint32_t(atoi(payload.c_str()))); }
   void on_dose_for_seconds(const std::string &topic, const std::string &payload) { this->dose_for_seconds(uint32_t(atoi(payload.c_str()))); }
