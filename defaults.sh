@@ -10,7 +10,7 @@
 set_service_flag $service_name
 
 if [ "$LIVE_MOUNT_ESPHOME_ENABLED" ]; then
-    export ESPHOME_VOLUME=${TECHNOCORE_ROOT}/prod-data/esphome/
+    export ESPHOME_VOLUME=${TECHNOCORE_ROOT}/data/esphome/
 else
     export ESPHOME_VOLUME=esphome
 
