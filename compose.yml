@@ -58,7 +58,7 @@ services:
       - host_working_dir=$PWD
       #- debug=${esphome_debug}
       - esphome_core=./esphome-core:/esphome-core
-      - esphome_app=${DEV_MOUNT_ESPHOME_ESPHOME:-$EMPTY_MOUNT}
+      - ESPHOME_VOLUME=${DEV_MOUNT_ESPHOME_ESPHOME:-$EMPTY_MOUNT}
       - TECHNOCORE_ROOT=${TECHNOCORE_ROOT}
       - MQTT_USERNAME=esphome
       # TODO: Have the python read the secrets file rather than the env.
