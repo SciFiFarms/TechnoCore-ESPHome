@@ -14,7 +14,7 @@ if [ "$LIVE_MOUNT_ESPHOME_ENABLED" ]; then
 else
     export ESPHOME_VOLUME=esphome
 
-    if ! docker volume ls | grep -w "${STACK_NAME}_esphome" 1>&2 ; then
+    if [ "$SERVICE_ESPHOME" ] && ! docker volume ls | grep -w "${STACK_NAME}_esphome" > /dev/null ; then
         export SERVICE_CONFIG_ESPHOME_INIT=${TECHNOCORE_SERVICES}/esphome/init.yml
     fi
 fi
